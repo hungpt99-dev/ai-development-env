@@ -1,0 +1,47 @@
+# Project configuration — EXAMPLE. Copy to <your-project>/project.yaml (or .ai/project.yaml).
+# A project EXTENDS the team standard without modifying the central repo.
+# Precedence: project.yaml > team.yaml > standards/.
+
+# Pin the standard version you were tested against.
+extends_standard: "1.0.0"
+# Policy: allow patch/minor drift, block major drift without migration.
+# e.g. compatible_with: ">=1.0.0 <2.0.0"
+compatible_with: ">=1.0.0 <2.0.0"
+
+project:
+  name: "example-spring-api"
+  language_stack: ["java-17", "spring-boot-3"]
+  repo: "https://example.com/org/example-spring-api"
+
+# ADDITIVE conventions (preferred): new files under knowledge/ or inline rules.
+conventions:
+  coding:
+    - "Follow Google Java Style; PALANTIR? No — keep it simple: 120 col, final params where practical."
+    - "All REST responses use envelope {code, message, data}."
+  database:
+    - "Flyway migrations only; no auto-DDL in prod."
+    - "All tables have created_at/updated_at; soft-delete via deleted_at."
+  api:
+    - "Version under /api/v1; breaking change requires /api/v2."
+    - "Error codes catalogued in knowledge/architecture/error-codes.md."
+
+# DOMAIN terminology — points at knowledge files, not inline dumps.
+glossary:
+  - "knowledge/glossary/domain.md"
+
+# Tighten a team rule (allowed freely):
+tighten:
+  testing:
+    - "Coverage gate: >=80% on new/changed lines (team default is >=70%)."
+
+# Loosen a team rule (allowed ONLY with waiver + approver + expiry):
+waivers: []
+# Example:
+# waivers:
+#   - rule: "standards/testing.md#no-snapshots-without-approval"
+#     reason: "Legacy UI migration, snapshots temporary"
+#     approved_by: "tech-lead@example.com"
+#     expires: "2026-12-31"
+
+# Tool default for this project (informational; devs may still use another adapter):
+default_tool: "opencode"

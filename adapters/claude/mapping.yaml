@@ -1,0 +1,30 @@
+tool: "claude"
+standard_version: "1.0.0"
+native_files:
+  - generated_path: "CLAUDE.md"
+    mechanism: "claude instructions file at repo root"
+    source_refs:
+      - "standards/ai-usage.md"
+      - "roles/ba.md"
+      - "roles/architect.md"
+      - "roles/developer.md"
+  - generated_path: ".claude/commands/analyze.md"
+    mechanism: "slash command -> prompts/analyze.md"
+    source_refs:
+      - "prompts/analyze.md"
+  - generated_path: ".claude/commands/plan.md"
+    mechanism: "slash command -> prompts/plan.md"
+    source_refs:
+      - "prompts/plan.md"
+  - generated_path: ".claude/commands/implement.md"
+    mechanism: "slash command -> prompts/implement.md"
+    source_refs:
+      - "prompts/implement.md"
+  - generated_path: ".claude/commands/review.md"
+    mechanism: "slash command -> prompts/review.md"
+    source_refs:
+      - "prompts/review.md"
+  - generated_path: ".claude/commands/debug.md"
+    mechanism: "slash command -> prompts/debug.md"
+    source_refs:
+      - "prompts/debug.md"

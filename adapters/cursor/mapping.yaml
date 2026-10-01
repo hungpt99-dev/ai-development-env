@@ -1,0 +1,19 @@
+tool: "cursor"
+standard_version: "1.0.0"
+native_files:
+  - generated_path: ".cursor/rules/ai-usage.mdc"
+    mechanism: "cursor rule -> standards/ai-usage.md"
+    source_refs:
+      - "standards/ai-usage.md"
+  - generated_path: ".cursor/rules/coding.mdc"
+    mechanism: "cursor rule -> standards/coding.md"
+    source_refs:
+      - "standards/coding.md"
+  - generated_path: ".cursor/rules/testing.mdc"
+    mechanism: "cursor rule -> standards/testing.md"
+    source_refs:
+      - "standards/testing.md"
+  - generated_path: ".cursor/rules/security.mdc"
+    mechanism: "cursor rule -> standards/security.md"
+    source_refs:
+      - "standards/security.md"

@@ -1,0 +1,17 @@
+# .gitignore for the standard repo itself (not for generated adapter output)
+node_modules/
+.DS_Store
+Thumbs.db
+
+# Local installer output (never commit generated tool configs blindly)
+.local/
+*.local.yaml
+*.local.json
+
+# Secrets — validation script also greps for these patterns
+.env
+.env.*
+*.pem
+*.key
+*secret*.json
+credentials.json
