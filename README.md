@@ -1,61 +1,133 @@
-# AI Engineering Standard — Team Kit
+# ai-development-env
 
-> **AI accelerates execution. Humans own decisions.**
+One-file checklist + setup notes for my AI agent stack.
+AI assists. Humans own decisions.
 
-One version-controlled source of truth for how this team uses AI during software development.
-Tool-agnostic. Model-agnostic. Provider-agnostic.
+## Checklist
 
-AI tools (OpenCode, Claude Code, Cursor, Copilot, Codex, …) are **clients/adapters** of this standard — never the standard itself.
+- [ ] Node 18+, Git, Bun (`bun --version`)
+- [ ] OpenCode installed (`opencode --version`)
+- [ ] OmniRoute gateway running (`http://localhost:20128`)
+- [ ] Default model set (`opencode/muse-spark-1.3-contributor-free`, build `xhigh`)
+- [ ] aitmpl SDLC bundle installed (46 skills, 20 agents, 14 commands)
+- [ ] Ponytail plugin enabled
+- [ ] Caveman skill installed
+- [ ] ECC installed (`npx ecc-universal@2.2.3 setup`)
+- [ ] MCPs live: Playwright, Context7, Git
+- [ ] Graphify index built (`graphify-out/graph.json`)
+- [ ] herdr installed (or tmux fallback)
+- [ ] ralph-tui installed (optional, autonomous loops)
+- [ ] Beads tracker ready (optional, pairs with ralph-tui)
 
-## Start here
+## Setup notes
 
-1. Read `docs/getting-started.md` (5-minute onboarding)
-2. Check `team.yaml` (team defaults + standard version)
-3. Pick your adapter: `adapters/<your-tool>/README.md`
-4. Run the installer: `./scripts/install.ps1` (Windows) or `./scripts/install.sh` (macOS/Linux)
+### aitmpl.com — component catalog
+890 skills · 422 agents · 288 commands · 72 settings · 62 hooks · 105 MCPs.
+Installs to `.claude/` (OpenCode auto-loads `~/.claude/skills`).
 
-## What's inside
-
-| Path | Purpose |
-|---|---|
-| `standards/` | Non-negotiable engineering rules (coding, architecture, security, testing, git, AI usage) |
-| `roles/` | What each AI role may / must / must-not do (BA → Architect → Developer → QA → Reviewer → DevOps) |
-| `workflows/` | End-to-end SDLC workflows with handoffs and quality gates |
-| `gates/` | Pass/fail checklists per stage — used by humans and AI alike |
-| `templates/` | Reusable output shapes (requirement, design, tasks, test plan, review) |
-| `prompts/` | Small composable AI instructions (analyze, plan, implement, review, debug) |
-| `knowledge/` | Small focused docs: engineering, architecture, patterns, glossary, examples |
-| `adapters/` | Thin per-tool translations. No rules duplicated here. |
-| `scripts/` | `install.*` + `validate.*` — onboarding and CI checks |
-| `docs/` | Architecture, contribution, customization, versioning |
-| `team.yaml` | Team identity, defaults, standard version |
-| `project.example.yaml` | How a project overrides/extends team rules without forking |
-
-## Core principle
-
-- AI **assists** with: analysis, documentation, implementation, testing, review, debugging, refactoring.
-- AI **must not** silently make product or architectural decisions.
-- Every AI output that touches a decision must label:
-  `Decided (human)` · `Proposed by AI` · `Assumption` · `Open question` · `Trade-off`
-
-## Precedence (highest wins)
-
+```bash
+npx claude-code-templates@latest --skill development/java-pro
+npx claude-code-templates@latest --agent programming-languages/spring-boot-engineer
+npx claude-code-templates@latest --command utilities/code-review
+npx claude-code-templates@latest --mcp devtools/markitdown
 ```
-project.yaml (project overrides)
-  > team.yaml (team defaults)
-    > standards/ (team rules)
+Note: GitHub API rate-limits (~60/hr unauth). If hit, `git clone
+https://github.com/davila7/claude-code-templates.git` and copy dirs manually.
+Claude agent/command frontmatter (`tools:`, `model: sonnet`, `allowed-tools:`)
+breaks OpenCode validation — strip those lines from OpenCode copies.
+
+### Ponytail — lazy build mode
+Shortest working diff wins. Stdlib/native first. No unrequested abstractions.
+Opencode plugin (already in `opencode.json`):
+
+```json
+"plugin": ["@dietrichgebert/ponytail"]
+```
+Levels: `/ponytail lite|full|ultra`. Off: `stop ponytail`. Mark deliberate
+shortcuts with `# ponytail: <ceiling>, <upgrade path>`.
+
+### Caveman — terse talk mode
+Pairs with Ponytail (Ponytail = what to build, Caveman = how to talk).
+Cuts output ~65-75%, code/commands/errors stay byte-exact.
+
+```bash
+npx skills add JuliusBrussee/caveman
+```
+Levels `/caveman lite|full|ultra`. Off: `stop caveman`. Drop for security
+warnings and irreversible confirmations, resume after.
+
+### OmniRoute — model gateway
+One gateway, 1100+ models, effort tiers (`none|low|medium|high|xhigh|max`).
+
+```bash
+# gateway at http://localhost:20128, plugin in opencode.json:
+["./plugins/omniroute/dist/index.js",
+  { "providerId": "omniroute", "baseURL": "http://localhost:20128",
+    "features": { "combos": false, "autoCombos": false } }]
+```
+Model format: `provider/model`, e.g. `opencode/muse-spark-1.3-contributor-free`.
+Default in `opencode.json`: top-level `model` + `agent.build.{model,variant}`.
+Restart opencode after config change (no hot-reload).
+
+### ECC — agent harness (affaan-m/ECC)
+68 agents · 293 skills · 94 commands. Skills, instincts, memory, AgentShield.
+
+```bash
+npx ecc-universal@2.2.3 setup          # guided, pick Global + Standard hooks
+```
+Do not stack install methods (plugin XOR manual). State:
+`~/.config/opencode/ecc-install-state.json`. Docs: https://ecc.tools
+
+### Agent Skills — the standard
+Every skill = folder + `SKILL.md` with `name`/`description` frontmatter.
+OpenCode auto-loads `~/.claude/skills`, `~/.agents/skills`; extra paths via
+`skills.paths` in `opencode.json`. Keep `description` concrete (what + when).
+
+### MCP — Playwright, Context7, Git
+In `opencode.json` (`mcp.<name>` needs `type`; `command` is an array):
+
+```json
+"playwright": { "type": "local",
+  "command": ["npx", "-y", "@playwright/mcp@latest"], "enabled": true },
+"context7": { "type": "local",
+  "command": ["npx", "-y", "@upstash/context7-mcp@latest"], "enabled": true },
+"git": { "type": "local",
+  "command": ["uvx", "mcp-server-git", "--repository", "<repo>"], "enabled": true }
+```
+`{env:VAR}` interpolates env in headers. `enabled: false` disables inherited.
+
+### Graphify — codebase knowledge graph
+Query graph before grep. Build index → `graphify-out/graph.json`, MCP reads it:
+
+```json
+"graphify": { "type": "local",
+  "command": ["graphify-mcp", "--graph", "<root>/graphify-out/graph.json"],
+  "enabled": true }
 ```
 
-A project may **add** rules or **tighten** rules. It may only **loosen** a rule with an explicit waiver (`waivers:` in project config + expiry + approver).
+### herdr — agent runtime
+Tmux that understands agents. Panes marked working/blocked/idle, survives
+lid-close/SSH-drop, multi-machine over SSH, agents drive it via CLI/socket.
 
-## Version
+```bash
+curl -fsSL https://herdr.dev/install.sh | sh
+herdr            # run agents inside, ctrl+b q detaches, herdr reattaches
+```
+Supports Claude Code, Codex, Cursor, opencode, Grok, 20+ CLIs. Apache-2.0.
+Alternative: plain **tmux**/**Zellij** (persistent sessions, zero agent
+awareness) — use when herdr is overkill for one quick agent.
 
-Current standard version: see `team.yaml` → `standard_version` (now `1.0.0`).
-Versioning policy: `docs/versioning.md`. Changelog: `CHANGELOG.md`.
-Validation: `pwsh ./scripts/validate.ps1` or `bash ./scripts/validate.sh`.
+### Beads — git-backed task tracker (pairs with herdr/ralph)
+Dependency-aware issues that live in git, no server. Ralph-tui reads it
+directly (`beads` / `beads-bv` trackers). Use instead of `prd.json` when tasks
+have dependencies. Alternative to hosted trackers (Linear/Jira) for agent loops.
 
-## Design choice: no `core/` wrapper
+### ralph-tui — autonomous agent loop (optional)
+Feeds task list to OpenCode/Claude Code until empty. Select → prompt →
+execute → detect `<promise>COMPLETE</promise>`.
 
-This repo keeps the standard at the **root** (`standards/`, `roles/`, …) and isolates tool specifics under `adapters/`.
-Rationale: less nesting, shorter relative links, easier `git sparse-checkout`, and the root *is* the source of truth by default.
-See `docs/architecture.md` for justification and alternatives considered.
+```bash
+bun install -g ralph-tui
+ralph-tui setup && ralph-tui create-prd --chat && ralph-tui run --prd ./prd.json
+```
+Trackers: `prd.json` (simple) or Beads (dependencies). Needs Bun runtime.
